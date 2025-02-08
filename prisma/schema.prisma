@@ -1,10 +1,10 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
 }
 
 model Account {
@@ -35,20 +35,20 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?       @unique
   emailVerified DateTime?
   password      String?
   image         String?
   accounts      Account[]
   sessions      Session[]
-
+  csr_records   csr_records[]
   // Company specific fields
-  companyName String?
-  mission     String?
-  vision      String?
-  sector      String?
+  companyName   String?
+  mission       String?
+  vision        String?
+  sector        String?
 }
 
 model VerificationToken {
@@ -57,4 +57,55 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model csr_records {
+  id          String    @id @db.VarChar
+  user_id     String // Add this field
+  name        String?   @db.VarChar
+  description String?   @db.VarChar
+  start_date  String?   @db.VarChar
+  end_date    String?   @db.VarChar
+  attendees   String?   @db.VarChar
+  track       String?   @db.VarChar
+  metrics     Json?     @db.Json
+  complete    Boolean?
+  questions   Json?     @db.Json
+  qa_history  Json?     @db.Json
+  created_at  DateTime? @db.Timestamp(6)
+  updated_at  DateTime? @db.Timestamp(6)
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model employee_evaluations {
+  id                  String    @id @db.VarChar
+  start_datetime      DateTime? @db.Timestamp(6)
+  end_datetime        DateTime? @db.Timestamp(6)
+  total_employees     Int?
+  processed_count     Int?
+  evaluated_records   Json?     @db.Json
+  problem_categories  Json?     @db.Json
+  positive_categories Json?     @db.Json
+  status              String?   @db.VarChar
+  created_at          DateTime? @db.Timestamp(6)
+}
+
+model employee_reviews {
+  id                  String    @id @db.VarChar
+  name                String?   @db.VarChar
+  place               String?   @db.VarChar
+  job_type            String?   @db.VarChar
+  department          String?   @db.VarChar
+  date                String?   @db.VarChar
+  overall_rating      String?   @db.VarChar
+  work_life_balance   String?   @db.VarChar
+  skill_development   String?   @db.VarChar
+  salary_and_benefits String?   @db.VarChar
+  job_security        String?   @db.VarChar
+  career_growth       String?   @db.VarChar
+  work_satisfaction   String?   @db.VarChar
+  likes               String?   @db.VarChar
+  dislikes            String?   @db.VarChar
+  created_at          DateTime? @db.Timestamp(6)
 }
