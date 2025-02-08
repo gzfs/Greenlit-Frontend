@@ -55,54 +55,72 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-emerald-800"
+            className="text-sm text-emerald-700 backdrop-blur-sm bg-white/20 px-4 py-2 rounded-full border border-emerald-400/40"
           >
             {dateRange}
           </motion.div>
         </div>
 
-        {/* Stats Overview */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-3 gap-6"
-        >
-          <div className="glass-card p-6">
-            <h3 className="text-sm font-medium text-emerald-800 mb-2">
-              EOI Sent
-            </h3>
-            <div className="flex items-baseline">
-              <span className="text-3xl font-bold text-emerald-900">7,052</span>
-              <span className="ml-2 text-sm text-emerald-700">$22.5M</span>
-            </div>
-          </div>
-          <div className="glass-card p-6">
-            <h3 className="text-sm font-medium text-emerald-800 mb-2">
-              New Requests
-            </h3>
-            <div className="flex items-baseline">
-              <span className="text-3xl font-bold text-emerald-900">34</span>
-              <span className="ml-2 text-sm text-emerald-700">$5.9M</span>
-            </div>
-          </div>
-          <div className="glass-card p-6">
-            <h3 className="text-sm font-medium text-emerald-800 mb-2">
-              Total Amount
-            </h3>
-            <div className="flex items-baseline">
-              <span className="text-3xl font-bold text-emerald-900">
-                $25.5M
-              </span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Charts Grid */}
-        <div className="grid grid-cols-2 gap-6">
-          {/* State Distribution */}
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="glass-card p-6">
+              <h3 className="text-sm font-medium text-emerald-800 mb-2">
+                EOI Sent
+              </h3>
+              <div className="flex items-baseline">
+                <span className="text-3xl font-bold text-emerald-900">
+                  7,052
+                </span>
+                <span className="ml-2 text-sm text-emerald-600">$22.5M</span>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="glass-card p-6">
+              <h3 className="text-sm font-medium text-emerald-800 mb-2">
+                New Requests
+              </h3>
+              <div className="flex items-baseline">
+                <span className="text-3xl font-bold text-emerald-900">34</span>
+                <span className="ml-2 text-sm text-emerald-600">$5.9M</span>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="glass-card p-6">
+              <h3 className="text-sm font-medium text-emerald-800 mb-2">
+                Total Amount
+              </h3>
+              <div className="flex items-baseline">
+                <span className="text-3xl font-bold text-emerald-900">
+                  $25.5M
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Charts Grid */}
+        <div className="grid grid-cols-2 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
             className="glass-card p-6"
           >
             <h3 className="text-lg font-semibold text-emerald-900 mb-4">
@@ -116,25 +134,27 @@ export default function DashboardPage() {
                 >
                   <span className="text-emerald-800">{item.state}</span>
                   <div className="flex items-center">
-                    <div className="w-32 h-2 bg-emerald-100 rounded-full mr-3">
+                    <span className="text-emerald-600 font-medium">
+                      ${item.amount}M
+                    </span>
+                    <div className="w-32 h-2 bg-emerald-100 rounded-full ml-4">
                       <div
-                        className="h-full bg-emerald-500 rounded-full"
+                        className="h-full bg-emerald-400 rounded-full"
                         style={{
                           width: `${(item.amount / 18.6) * 100}%`,
                         }}
                       />
                     </div>
-                    <span className="text-emerald-700">${item.amount}M</span>
                   </div>
                 </div>
               ))}
             </div>
           </motion.div>
 
-          {/* Trend Chart */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
             className="glass-card p-6"
           >
             <h3 className="text-lg font-semibold text-emerald-900 mb-4">
@@ -160,7 +180,14 @@ export default function DashboardPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                   <XAxis dataKey="name" stroke="#374151" />
                   <YAxis stroke="#374151" />
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={{
+                      background: "rgba(255, 255, 255, 0.8)",
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid rgba(16, 185, 129, 0.2)",
+                      borderRadius: "12px",
+                    }}
+                  />
                   <Area
                     type="monotone"
                     dataKey="Development"

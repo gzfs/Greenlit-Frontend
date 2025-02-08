@@ -134,3 +134,37 @@ export function MaterialSymbolsLightArrowOutward(
     </svg>
   );
 }
+
+export function MaterialSymbolsArrowBack(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        d="m7.825 13l5.6 5.6L12 20l-8-8l8-8l1.425 1.4l-5.6 5.6H20v2z"
+      ></path>
+    </svg>
+  );
+}
+
+export function TablerCloverFilled(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        d="m12.712 13.297l3.398 3.442a3.104 3.104 0 0 1 0 4.351a3.04 3.04 0 0 1-4.036.27l-.075-.062l-.073.062a3.04 3.04 0 0 1-1.664.634l-.203.007a3.04 3.04 0 0 1-2.17-.91a3.104 3.104 0 0 1 .002-4.354l3.397-3.44a1 1 0 0 1 1.424 0M21.09 7.89a3.04 3.04 0 0 1 .27 4.037l-.062.073l.062.075a3.04 3.04 0 0 1 .634 1.664l.007.203a3.04 3.04 0 0 1-.91 2.17a3.104 3.104 0 0 1-4.354-.002l-3.44-3.397a1 1 0 0 1 0-1.424L16.74 7.89a3.104 3.104 0 0 1 4.351 0m-13.827.002l3.44 3.397a1 1 0 0 1 0 1.424L7.26 16.11a3.104 3.104 0 0 1-4.351 0a3.04 3.04 0 0 1-.27-4.036l.062-.075l-.062-.073a3.04 3.04 0 0 1-.634-1.664l-.007-.203c0-.816.328-1.598.91-2.17a3.104 3.104 0 0 1 4.354.002M13.94 2a3.04 3.04 0 0 1 2.17.91a3.104 3.104 0 0 1-.002 4.354l-3.397 3.44a1 1 0 0 1-1.424 0L7.89 7.26a3.104 3.104 0 0 1 0-4.351a3.04 3.04 0 0 1 4.036-.27l.073.062l.075-.062a3.04 3.04 0 0 1 1.664-.634z"
+      ></path>
+    </svg>
+  );
+}

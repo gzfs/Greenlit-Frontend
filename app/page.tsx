@@ -8,152 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { useRouter } from "next/navigation";
-
-interface Question {
-  id: string;
-  text: string;
-  type: "number" | "percentage" | "text" | "boolean";
-  unit?: string;
-  code: string;
-}
-
-interface Category {
-  title: string;
-  questions: Question[];
-}
-
-const categories: Record<string, Category> = {
-  "Safety of Clinical Trial Participants": {
-    title: "Clinical Trial Safety",
-    questions: [
-      {
-        id: "inspections",
-        text: "Number of inspections related to clinical trial management",
-        type: "number",
-        unit: "Number",
-        code: "HC-BP-210a.2",
-      },
-      {
-        id: "monetary_losses",
-        text: "Total amount of monetary losses due to legal proceedings related to clinical trials",
-        type: "number",
-        unit: "Currency",
-        code: "HC-BP-210a.3",
-      },
-      {
-        id: "management_process",
-        text: "Discussion of management process to ensure quality and patient safety during clinical trials",
-        type: "text",
-        unit: "n/a",
-        code: "HC-BP-210a.1",
-      },
-    ],
-  },
-  "Affordability & Pricing": {
-    title: "Pricing Metrics",
-    questions: [
-      {
-        id: "list_price_change",
-        text: "Percentage change in weighted average list price",
-        type: "percentage",
-        unit: "Percentage",
-        code: "HC-BP-240b.2",
-      },
-      {
-        id: "net_price_change",
-        text: "Percentage change in weighted average net price",
-        type: "percentage",
-        unit: "Percentage",
-        code: "HC-BP-240b.2",
-      },
-    ],
-  },
-  "Drug Safety": {
-    title: "Product Safety",
-    questions: [
-      {
-        id: "fatalities",
-        text: "Number of fatalities associated with products",
-        type: "number",
-        unit: "Number",
-        code: "HC-BP-250a.2",
-      },
-      {
-        id: "recalls_count",
-        text: "Number of recalls issued",
-        type: "number",
-        unit: "Number",
-        code: "HC-BP-250a.3",
-      },
-      {
-        id: "units_recalled",
-        text: "Total units recalled",
-        type: "number",
-        unit: "Number",
-        code: "HC-BP-250a.3",
-      },
-    ],
-  },
-  "Counterfeit Drugs": {
-    title: "Anti-Counterfeiting Measures",
-    questions: [
-      {
-        id: "enforcement_actions",
-        text: "Number of actions that led to raids, seizure, arrests, or filing of criminal charges",
-        type: "number",
-        unit: "Number",
-        code: "HC-BP-260a.3",
-      },
-      {
-        id: "traceability_methods",
-        text: "Description of methods and technologies used to maintain traceability of products throughout the supply chain",
-        type: "text",
-        unit: "n/a",
-        code: "HC-BP-260a.1",
-      },
-    ],
-  },
-  "Employee Recruitment, Development & Retention": {
-    title: "Employee Metrics",
-    questions: [
-      {
-        id: "voluntary_turnover",
-        text: "Voluntary turnover rate for executive managers",
-        type: "percentage",
-        unit: "Percentage",
-        code: "HC-BP-330a.2",
-      },
-      {
-        id: "involuntary_turnover",
-        text: "Involuntary turnover rate for executive managers",
-        type: "percentage",
-        unit: "Percentage",
-        code: "HC-BP-330a.2",
-      },
-    ],
-  },
-};
-
-const boxes = [
-  {
-    id: 1,
-    title: "Clinical Safety",
-    description: "Evaluate clinical trial safety and management processes",
-    category: "Safety of Clinical Trial Participants",
-  },
-  {
-    id: 2,
-    title: "Market Access",
-    description: "Assess pricing strategies and affordability metrics",
-    category: "Affordability & Pricing",
-  },
-  {
-    id: 3,
-    title: "Quality Control",
-    description: "Monitor product safety and anti-counterfeiting measures",
-    category: "Drug Safety",
-  },
-];
+import { categories, boxes } from "@/data/Mock";
 
 export default function Home() {
   const [selectedBox, setSelectedBox] = useState<number | null>(null);
@@ -217,7 +72,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100">
+    <main className="grid grid-cols-12 relative min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100">
       <Sidebar />
 
       {/* Loading Overlay */}
@@ -257,7 +112,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <div className="ml-64">
+      <div className="col-span-9 w-full place-self-center relative">
         <AnimatePresence mode="wait">
           {selectedBox ? (
             <motion.div
@@ -265,7 +120,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 filter backdrop-blur-md w-[600px]"
+              className="absolute -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 filter backdrop-blur-md w-[600px]"
             >
               <motion.div
                 layout
@@ -290,7 +145,7 @@ export default function Home() {
                   </motion.div>
                 </div>
 
-                <div className="space-y-6">
+                <div>
                   {currentQuestions.map((question) => (
                     <div key={question.id} className="space-y-2">
                       <label className="text-sm font-medium text-emerald-700">
@@ -430,7 +285,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="fixed bottom-0 m-8 mb-12 space-y-8"
+              className="space-y-8 m-4 place-self-center"
             >
               <div className="flex gap-5 justify-center">
                 {boxes.map((box) => (
@@ -441,8 +296,8 @@ export default function Home() {
                     onClick={() => setSelectedBox(box.id)}
                   >
                     <div className="flex w-full justify-end">
-                      <div className="p-3.5 bg-white w-fit rounded-full border border-emerald-400/40">
-                        <MaterialSymbolsLightArrowOutward className="text-xl text-emerald-400" />
+                      <div className="p-3.5 bg-emerald-400/20 w-fit rounded-full border border-emerald-400/40">
+                        <MaterialSymbolsLightArrowOutward className="text-xl text-emerald-700" />
                       </div>
                     </div>
 
@@ -459,12 +314,12 @@ export default function Home() {
               </div>
 
               <div className="w-fit mx-auto space-y-2">
-                <div className="relative">
+                <div className="relative space-y-2">
                   <Progress
                     value={progress}
                     className="w-[600px] h-2 border border-emerald-400/40"
                   />
-                  <div className="absolute -bottom-6 left-0 right-0">
+                  <div className="">
                     <div className="flex justify-between text-xs text-emerald-600">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-400" />

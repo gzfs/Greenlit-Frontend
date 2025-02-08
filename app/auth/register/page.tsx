@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { determineSector } from "@/app/utils/sectorAnalysis";
+import Image from "next/image";
+import { toast } from "sonner";
+import { TablerCloverFilled } from "@/app/components/Icons";
+import { onest } from "@/app/layout";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -12,385 +17,225 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    companyDescription: "",
+    companyName: "",
+    missionAndVision: "",
   });
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState(1);
   const router = useRouter();
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const validateStepOne = () => {
-    const { name, email, password, confirmPassword } = formData;
-
-    if (!name) {
-      setError("Name is required");
-      return false;
-    }
-
-    if (!email) {
-      setError("Email is required");
-      return false;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError("Invalid email format");
-      return false;
-    }
-
-    if (!password) {
-      setError("Password is required");
-      return false;
-    }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
-      return false;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return false;
-    }
-
-    return true;
-  };
-
-  const validateStepTwo = () => {
-    const { companyDescription } = formData;
-
-    if (!companyDescription) {
-      setError("Company description is required");
-      return false;
-    }
-
-    if (companyDescription.length < 50) {
-      setError(
-        "Please provide a more detailed description (minimum 50 characters)"
-      );
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleNextStep = () => {
-    setError("");
-    if (step === 1 && validateStepOne()) {
-      setStep(2);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
 
-    if (!validateStepTwo()) {
-      setIsLoading(false);
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match", {
+        description: "Please make sure your passwords match",
+      });
       return;
     }
 
+    setIsLoading(true);
+    const sector = determineSector(formData.missionAndVision, "");
+
     try {
-      const { name, email, password, companyDescription } = formData;
-
-      // Determine sector based on description
-      const sector = determineSector(companyDescription, companyDescription);
-
-      // Register user
-      const registerResponse = await fetch("/api/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
-          email,
-          password,
-          mission: companyDescription,
-          vision: companyDescription,
+          ...formData,
+          mission: formData.missionAndVision,
+          vision: formData.missionAndVision,
           sector,
         }),
       });
 
-      // Parse response
-      const registerData = await registerResponse.json();
-
-      // Check for error in response
-      if (!registerResponse.ok) {
-        const errorMessage =
-          registerData.message || registerData.details || "Registration failed";
-
-        console.error("Registration error:", errorMessage);
-        setError(errorMessage);
-        return;
+      if (response.ok) {
+        toast.success("Registration successful", {
+          description: "Please sign in with your credentials",
+        });
+        router.push("/auth/signin");
+      } else {
+        const data = await response.json();
+        toast.error("Registration failed", {
+          description: data.error || "Please try again",
+        });
       }
-
-      // Automatically sign in after successful registration
-      const signInResponse = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
+    } catch (error) {
+      toast.error("Something went wrong", {
+        description: "Please try again later",
       });
-
-      if (signInResponse?.error) {
-        console.error("Sign-in error:", signInResponse.error);
-        throw new Error(signInResponse.error);
-      }
-
-      // Redirect to home page or dashboard
-      router.push("/");
-    } catch (err) {
-      console.error("Catch block error:", err);
-
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An unexpected error occurred during registration"
-      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  };
-
-  const stepVariants = {
-    enter: (direction: number) => {
-      return {
-        x: direction > 0 ? 300 : -300,
-        opacity: 0,
-      };
-    },
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => {
-      return {
-        zIndex: 0,
-        x: direction < 0 ? 300 : -300,
-        opacity: 0,
-      };
-    },
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-emerald-100 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center p-4">
       {/* Grainy overlay */}
       <div
-        className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        className="fixed inset-0 opacity-[0.03] pointer-events-none"
         style={{
-          backgroundImage: `
-          radial-gradient(circle at top right, rgba(56,189,248,0.2), transparent),
-          radial-gradient(circle at bottom left, rgba(16,185,129,0.2), transparent)
-        `,
-          backgroundBlendMode: "overlay",
-          mixBlendMode: "multiply",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
-      ></div>
-
-      {/* Noise texture */}
-      <div className="absolute inset-0 opacity-[0.05] pointer-events-none bg-noise"></div>
+      />
 
       <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-        className="relative z-10 w-full max-w-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-6xl  gap-8 my-8"
       >
-        <div className="glass-card backdrop-blur-xl bg-white/30 border border-white/20 shadow-2xl rounded-3xl p-8">
-          <AnimatePresence initial={false} mode="wait">
-            <motion.div
-              key={step}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              variants={stepVariants}
-              transition={{
-                x: { type: "spring", stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
-              }}
+        {/* Form Section */}
+        <div className="flex-1">
+          <div className="backdrop-blur-lg border border-emerald-400/40 bg-white/10 p-8 rounded-3xl shadow-[0px_0px_30px_rgba(255,255,255,0.1)]">
+            <p
+              className={`${onest.className} text-4xl font-semibold space-x-2 text-center text-emerald-700 tracking-tighter mb-6`}
             >
-              {step === 1 ? (
-                <div className="space-y-4">
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bg-red-100/70 backdrop-blur-sm text-red-700 p-3 rounded-lg mb-4 border border-red-200/50"
-                    >
-                      {error}
-                    </motion.div>
-                  )}
-
-                  {/* Input fields with glassmorphic style */}
-                  <div className="space-y-4">
-                    {[
-                      {
-                        name: "name",
-                        label: "Full Name",
-                        type: "text",
-                        placeholder: "Enter your full name",
-                      },
-                      {
-                        name: "email",
-                        label: "Email",
-                        type: "email",
-                        placeholder: "Enter your email address",
-                      },
-                      {
-                        name: "password",
-                        label: "Password",
-                        type: "password",
-                        placeholder: "Create a strong password",
-                      },
-                      {
-                        name: "confirmPassword",
-                        label: "Confirm Password",
-                        type: "password",
-                        placeholder: "Confirm your password",
-                      },
-                    ].map((field) => (
-                      <div key={field.name}>
-                        <label className="block text-sm font-medium text-emerald-900 mb-2">
-                          {field.label}
-                        </label>
-                        <input
-                          type={field.type}
-                          name={field.name}
-                          value={formData[field.name as keyof typeof formData]}
-                          onChange={handleChange}
-                          required
-                          placeholder={field.placeholder}
-                          className="w-full px-4 py-3 
-                            bg-white/50 
-                            backdrop-blur-sm 
-                            border border-white/30 
-                            rounded-xl 
-                            focus:ring-emerald-500 
-                            focus:border-emerald-500 
-                            focus:bg-white/70 
-                            transition-all 
-                            duration-300"
-                        />
-                      </div>
-                    ))}
-                  </div>
-
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleNextStep}
-                    className="w-full bg-emerald-600/80 backdrop-blur-sm text-white py-3 rounded-xl hover:bg-emerald-700/80 transition-colors"
-                  >
-                    Next
-                  </motion.button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bg-red-100/70 backdrop-blur-sm text-red-700 p-3 rounded-lg mb-4 border border-red-200/50"
-                    >
-                      {error}
-                    </motion.div>
-                  )}
-
-                  <div>
-                    <label className="block text-sm font-medium text-emerald-900 mb-2">
-                      Tell Us About Your Company
-                    </label>
-                    <textarea
-                      name="companyDescription"
-                      value={formData.companyDescription}
-                      onChange={handleChange}
-                      rows={6}
-                      required
-                      className="w-full px-4 py-3 
-                        bg-white/50 
-                        backdrop-blur-sm 
-                        border border-white/30 
-                        rounded-xl 
-                        focus:ring-emerald-500 
-                        focus:border-emerald-500 
-                        focus:bg-white/70 
-                        transition-all 
-                        duration-300"
-                      placeholder="Share a brief overview of your company, its purpose, key objectives, and what makes it unique. This will help us understand your business and categorize your sector."
-                    />
-                    <p className="text-xs text-emerald-900/70 mt-1 pl-1">
-                      Minimum 50 characters. Include your mission, vision, and
-                      key business goals.
-                    </p>
-                  </div>
-
-                  <div className="flex space-x-4">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setStep(1)}
-                      type="button"
-                      className="flex-1 bg-gray-200/50 backdrop-blur-sm text-emerald-900 py-3 rounded-xl hover:bg-gray-300/50 transition-colors"
-                    >
-                      Back
-                    </motion.button>
-
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleSubmit}
-                      disabled={isLoading}
-                      className={`
-                        flex-1 text-white py-3 rounded-xl transition-colors
-                        ${
-                          isLoading
-                            ? "bg-emerald-400/50 backdrop-blur-sm cursor-not-allowed"
-                            : "bg-emerald-600/80 backdrop-blur-sm hover:bg-emerald-700/80"
-                        }
-                      `}
-                    >
-                      {isLoading ? "Creating Account..." : "Register"}
-                    </motion.button>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
-
-          <div className="mt-4 text-center">
-            <p className="text-sm text-emerald-900/70">
-              Already have an account?{" "}
-              <a
-                href="/auth/signin"
-                className="text-emerald-700 hover:underline font-semibold"
-              >
-                Sign In
-              </a>
+              <TablerCloverFilled className="inline-block text-5xl" />
+              <span>greenlit</span>
             </p>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="text-sm font-medium text-emerald-700 mb-1 block">
+                    Full Name
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Enter your name"
+                    className="border text-emerald-800 border-emerald-400/40 p-3 shadow-none resize-none rounded-xl"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-emerald-700 mb-1 block">
+                    Email
+                  </label>
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="border text-emerald-800 border-emerald-400/40 p-3 shadow-none resize-none rounded-xl"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm tracking-tight text-emerald-700 mb-1 block">
+                    Password
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="Create a password"
+                    className="border text-emerald-800 border-emerald-400/40 p-3 shadow-none resize-none rounded-xl"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm tracking-tight text-emerald-700 mb-1 block">
+                    Confirm Password
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="Confirm your password"
+                    className="border text-emerald-800 border-emerald-400/40 p-3 shadow-none resize-none rounded-xl"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm tracking-tight text-emerald-700 mb-1 block">
+                  Company Name
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Enter your company name"
+                  className="border text-emerald-800 border-emerald-400/40 p-3 shadow-none resize-none rounded-xl"
+                  value={formData.companyName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, companyName: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-sm tracking-tight text-emerald-700 mb-1 block">
+                  Description of your Company
+                </label>
+                <Textarea
+                  placeholder="Describe your company's mission and vision..."
+                  value={formData.missionAndVision}
+                  className="border text-emerald-800 border-emerald-400/40 shadow-none resize-none p-3 rounded-xl"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      missionAndVision: e.target.value,
+                    })
+                  }
+                  required
+                />
+                <p className="mt-1.5 text-xs text-emerald-600/60">
+                  Share your company's purpose and future aspirations
+                </p>
+              </div>
+
+              <motion.button
+                whileHover={{ scale: isLoading ? 1 : 1.01 }}
+                whileTap={{ scale: isLoading ? 1 : 0.99 }}
+                type="submit"
+                disabled={isLoading}
+                className={`w-full py-3 px-4 rounded-xl transition-all duration-200 font-medium
+                  relative
+                  ${
+                    isLoading
+                      ? "bg-emerald-700/30 cursor-not-allowed"
+                      : "bg-emerald-700/50 hover:bg-emerald-700/90"
+                  }
+                  text-white`}
+              >
+                <span className={isLoading ? "opacity-0" : "opacity-100"}>
+                  Create Account
+                </span>
+                {isLoading && (
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  </div>
+                )}
+              </motion.button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-emerald-600">
+                Already have an account?{" "}
+                <a
+                  href="/auth/signin"
+                  className="font-medium text-emerald-700 hover:text-emerald-800 transition-colors"
+                >
+                  Sign in
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </motion.div>
