@@ -1,0 +1,29 @@
+{
+  "id": "gri-energy",
+  "name": "GRI Energy Standards",
+  "version": "1.0.0",
+  "standard": "GRI",
+  "description": "Global Reporting Initiative Energy Consumption Metrics",
+  "category": "Environmental",
+  "questions": [
+    {
+      "id": "gri-302-1",
+      "text": "Total fuel consumption from non-renewable sources",
+      "type": "number",
+      "unit": "Joules",
+      "code": "GRI 302-1"
+    },
+    {
+      "id": "gri-302-2",
+      "text": "Total fuel consumption from renewable sources",
+      "type": "number",
+      "unit": "Joules",
+      "code": "GRI 302-2"
+    }
+  ],
+  "metadata": {
+    "author": "GRI Standards Board",
+    "website": "https://www.globalreporting.org",
+    "documentation": "https://www.globalreporting.org/standards"
+  }
+} 

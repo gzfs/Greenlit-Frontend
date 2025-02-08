@@ -1,0 +1,35 @@
+{
+  "id": "cdp-climate",
+  "name": "CDP Climate Change",
+  "version": "1.0.0",
+  "standard": "CDP",
+  "description": "Carbon Disclosure Project Climate Metrics",
+  "category": "Environmental",
+  "questions": [
+    {
+      "id": "cdp-c6-1",
+      "text": "Scope 1 emissions",
+      "type": "number",
+      "unit": "Metric tons CO2e",
+      "code": "C6.1",
+      "validation": {
+        "min": 0
+      }
+    },
+    {
+      "id": "cdp-c6-3",
+      "text": "Scope 2 emissions",
+      "type": "number",
+      "unit": "Metric tons CO2e",
+      "code": "C6.3",
+      "validation": {
+        "min": 0
+      }
+    }
+  ],
+  "metadata": {
+    "author": "CDP",
+    "website": "https://www.cdp.net",
+    "documentation": "https://www.cdp.net/en/guidance"
+  }
+} 

@@ -11,6 +11,7 @@ Greenlit provides an intuitive platform for companies to:
 - Plan and monitor CSR initiatives
 - Generate comprehensive ESG reports
 - Benchmark against industry standards
+- Extensible plugin system for multiple ESG standards
 
 ## Tech Stack
 
@@ -44,10 +45,84 @@ Greenlit provides an intuitive platform for companies to:
 
 ### Questionnaire System
 
-- Multi-step questionnaire interface
-- Progress persistence
-- Real-time validation
-- Sector-specific analysis
+- Multi-step questionnaire interface with three main categories:
+
+  1. **Environmental Footprint**
+
+     - Energy consumption (GJ)
+     - Grid electricity usage (%)
+     - Environmental planning assessment
+
+  2. **Data Privacy & Security**
+
+     - Secondary data usage tracking
+     - Privacy-related losses (Currency)
+     - Security incident monitoring
+     - User impact assessment
+
+  3. **Technology Disruptions**
+     - Service disruption tracking
+     - Downtime measurement (Days)
+     - Business continuity analysis
+
+- Real-time validation with unit-specific inputs
+- Progress persistence across sessions
+- Sector-specific analysis and benchmarking
+- SASB (Sustainability Accounting Standards Board) aligned metrics
+
+## Plugin System
+
+Greenlit features a flexible plugin architecture that supports multiple ESG reporting standards:
+
+### Supported Standards
+
+- **SASB** (Sustainability Accounting Standards Board)
+
+  - Technology & Communications
+  - Environmental Metrics
+  - Data Security
+
+- **GRI** (Global Reporting Initiative)
+
+  - Energy (GRI 302)
+  - Water (GRI 303)
+  - Emissions (GRI 305)
+
+- **CDP** (Carbon Disclosure Project)
+  - Climate Change
+  - Water Security
+
+### Plugin Structure
+
+Each plugin follows a standardized manifest format:
+
+```json
+{
+  "id": "standard-category",
+  "name": "Standard Name",
+  "version": "1.0.0",
+  "standard": "Standard Type",
+  "category": "Metric Category",
+  "questions": [
+    {
+      "id": "metric-id",
+      "text": "Question text",
+      "type": "number|percentage|text",
+      "unit": "Measurement unit",
+      "code": "Standard-specific code"
+    }
+  ]
+}
+```
+
+### Plugin Development
+
+To create a new standard plugin:
+
+1. Create a new directory in `/plugins/{standard-name}`
+2. Add a `manifest.json` following the plugin schema
+3. Implement any standard-specific validation
+4. Add documentation in `/plugins/{standard-name}/README.md`
 
 ## Getting Started
 
@@ -88,6 +163,10 @@ app/
 │   ├── ui/          # shadcn/ui components
 │   └── Icons.tsx    # Icon components
 ├── data/            # Mock data and constants
+├── plugins/         # ESG Standard plugins
+│   ├── gri/        # Global Reporting Initiative
+│   ├── sasb/       # SASB Standards
+│   └── cdp/        # Carbon Disclosure Project
 └── layout.tsx       # Root layout
 ```
 

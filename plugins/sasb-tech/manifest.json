@@ -1,0 +1,36 @@
+{
+  "id": "sasb-tech",
+  "name": "SASB Technology Standards",
+  "version": "1.0.0",
+  "standard": "SASB",
+  "description": "Technology & Communications Sustainability Metrics",
+  "category": "Technology",
+  "questions": [
+    {
+      "id": "tc-si-130a1",
+      "text": "Total energy consumed",
+      "type": "number",
+      "unit": "Gigajoules (GJ)",
+      "code": "TC-SI-130a.1",
+      "validation": {
+        "min": 0
+      }
+    },
+    {
+      "id": "tc-si-130a2",
+      "text": "Percentage grid electricity",
+      "type": "percentage",
+      "unit": "Percentage (%)",
+      "code": "TC-SI-130a.1",
+      "validation": {
+        "min": 0,
+        "max": 100
+      }
+    }
+  ],
+  "metadata": {
+    "author": "SASB Standards Board",
+    "website": "https://www.sasb.org",
+    "documentation": "https://www.sasb.org/standards/download"
+  }
+} 

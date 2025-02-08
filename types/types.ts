@@ -1,8 +1,8 @@
 export interface Question {
   id: string;
   text: string;
-  type: "number" | "percentage" | "text" | "boolean";
-  unit?: string;
+  type: "number" | "text" | "percentage" | "boolean";
+  unit: string;
   code: string;
 }
 
