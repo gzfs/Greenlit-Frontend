@@ -9,6 +9,8 @@ export async function POST(request: NextRequest) {
     // Parse the request body safely
     const body = await request.json();
 
+    console.log(body);
+
     // Destructure with default values and type checking
     const {
       name = "",

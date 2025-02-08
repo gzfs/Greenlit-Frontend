@@ -56,15 +56,14 @@ export async function GET(request: NextRequest) {
         user_id: session.user.id,
       },
       orderBy: {
-        created_at: 'desc'
-      }
+        created_at: "desc",
+      },
     });
 
     return NextResponse.json(records);
   } catch (error) {
-    console.error("CSR API Error:", error);
     return NextResponse.json([]);
   } finally {
     await prisma.$disconnect();
   }
-} 
+}
