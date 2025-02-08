@@ -10,7 +10,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Destructure with default values and type checking
-    const { email = "", password = "", name = "" } = body || {};
+    const {
+      name = "",
+      email = "",
+      password = "",
+      mission = "",
+      vision = "",
+    } = body || {};
 
     // Validate input
     if (!email || !password) {
@@ -55,9 +61,11 @@ export async function POST(request: NextRequest) {
     // Create user
     const user = await prisma.user.create({
       data: {
-        email: email,
-        name: name,
+        email,
+        name,
         password: hashedPassword,
+        mission,
+        vision,
       },
     });
 

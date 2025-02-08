@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -15,6 +16,7 @@
     "@types/bcrypt": "^5.0.2",
     "bcrypt": "^5.1.1",
     "d3": "^7.9.0",
+    "framer-motion": "^12.4.1",
     "mapbox-gl": "^3.9.4",
     "next": "15.1.6",
     "next-auth": "^4.24.11",
