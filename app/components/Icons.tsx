@@ -115,3 +115,22 @@ export function SolarLogin3Bold(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function MaterialSymbolsLightArrowOutward(
+  props: SVGProps<SVGSVGElement>
+) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        d="M6.189 17.289L5.5 16.6L15.58 6.5H6.289v-1h11v11h-1V7.208z"
+      ></path>
+    </svg>
+  );
+}

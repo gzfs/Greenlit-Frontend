@@ -221,10 +221,6 @@ export default function RegisterPage() {
         className="relative z-10 w-full max-w-md"
       >
         <div className="glass-card backdrop-blur-xl bg-white/30 border border-white/20 shadow-2xl rounded-3xl p-8">
-          <h2 className="text-3xl font-bold mb-6 text-emerald-800 text-center">
-            Create Your Account
-          </h2>
-
           <AnimatePresence initial={false} mode="wait">
             <motion.div
               key={step}
