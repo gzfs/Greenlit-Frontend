@@ -20,8 +20,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -41,14 +40,13 @@ model User {
   emailVerified DateTime?
   password      String?
   image         String?
-  accounts      Account[]
-  sessions      Session[]
-  csr_records   csr_records[]
-  // Company specific fields
   companyName   String?
   mission       String?
   vision        String?
   sector        String?
+  accounts      Account[]
+  sessions      Session[]
+  csr_records   csr_records[]
 }
 
 model VerificationToken {
@@ -61,7 +59,6 @@ model VerificationToken {
 
 model csr_records {
   id          String    @id @db.VarChar
-  user_id     String // Add this field
   name        String?   @db.VarChar
   description String?   @db.VarChar
   start_date  String?   @db.VarChar
@@ -74,8 +71,8 @@ model csr_records {
   qa_history  Json?     @db.Json
   created_at  DateTime? @db.Timestamp(6)
   updated_at  DateTime? @db.Timestamp(6)
-
-  user User @relation(fields: [user_id], references: [id])
+  user_id     String?   @db.VarChar
+  user        User?     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model employee_evaluations {

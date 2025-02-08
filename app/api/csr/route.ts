@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const API_URL = "http://localhost:8000";
 
@@ -20,7 +23,6 @@ export async function POST(request: NextRequest) {
       followup_answers,
       user_id: session.user.id,
     };
-    console.log("Request Body:", requestBody);
 
     const response = await fetch(`${API_URL}/classify`, {
       method: "POST",
@@ -44,31 +46,25 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    console.log("API Session:", session);
-    
     if (!session?.user?.id) {
-      console.log("No session or user ID. Session:", session);
-      console.log("User:", session?.user);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const event_id = searchParams.get("event_id");
+    // Fetch CSR records for the current user from our database
+    const records = await prisma.csr_records.findMany({
+      where: {
+        user_id: session.user.id,
+      },
+      orderBy: {
+        created_at: 'desc'
+      }
+    });
 
-    if (event_id) {
-      const response = await fetch(`${API_URL}/status/${event_id}`);
-      const data = await response.json();
-      return NextResponse.json(data);
-    }
-
-    // Get all events for this user from the FastAPI backend
-    const response = await fetch(`${API_URL}/events/${session.user.id}`);
-    const events = await response.json();
-    console.log("Found events:", events);
-    
-    return NextResponse.json(events);
+    return NextResponse.json(records);
   } catch (error) {
     console.error("CSR API Error:", error);
     return NextResponse.json([]);
+  } finally {
+    await prisma.$disconnect();
   }
 } 

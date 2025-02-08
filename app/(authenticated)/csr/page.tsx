@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import Spinner from '@/app/components/Spinner';
 
 interface CSREvent {
   id: string;
@@ -18,42 +20,42 @@ interface CSREvent {
 
 const CSREvaluation = () => {
   const { data: session } = useSession();
-  console.log("CSR Page session:", session);
   const [events, setEvents] = useState<CSREvent[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState('');
   const [selectedEvent, setSelectedEvent] = useState<CSREvent | null>(null);
   const [answers, setAnswers] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const router = useRouter();
 
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    if (session?.user?.id) {
+      fetchEvents();
+    }
+  }, [session?.user?.id]);
 
   const fetchEvents = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch('/api/csr');
-      console.log("API Response status:", response.status);
-      const data = await response.json();
-      console.log("API Response data:", data);
-      
-      if (Array.isArray(data)) {
-        console.log("Setting events array:", data);
-        setEvents(data);
-      } else if (data.events && Array.isArray(data.events)) {
-        console.log("Setting events from data.events:", data.events);
-        setEvents(data.events);
-      } else {
-        console.log("No valid events data found in response:", data);
-        setEvents([]);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      const data = await response.json();
+      setEvents(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching events:', error);
       setEvents([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const createCSREvent = async () => {
+    if (!session?.user?.id) return;
+    
     setLoading(true);
     try {
       const response = await fetch('/api/csr', {
@@ -61,12 +63,24 @@ const CSREvaluation = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ description }),
+        body: JSON.stringify({
+          description,
+        }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
-      setEvents([...events, data]);
+      await fetchEvents();
       setIsModalOpen(false);
       setDescription('');
+      
+      if (data.questions && data.questions.length > 0) {
+        setSelectedEvent(data);
+        setAnswers(new Array(data.questions.length).fill(''));
+      }
     } catch (error) {
       console.error('Error creating event:', error);
     }
@@ -74,6 +88,8 @@ const CSREvaluation = () => {
   };
 
   const submitAnswers = async (event_id: string) => {
+    if (!session?.user?.id) return;
+    
     setLoading(true);
     try {
       const response = await fetch('/api/csr', {
@@ -86,93 +102,104 @@ const CSREvaluation = () => {
           followup_answers: answers,
         }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       setSelectedEvent(data);
       setAnswers([]);
-      await fetchEvents(); // Refresh events list
+      await fetchEvents();
     } catch (error) {
       console.error('Error submitting answers:', error);
     }
     setLoading(false);
   };
 
-  const handleEventClick = async (event: CSREvent) => {
-    try {
-      const response = await fetch(`/api/csr?event_id=${event.id}`);
-      const data = await response.json();
-      setSelectedEvent(data);
-      setAnswers(new Array(data.questions?.length || 0).fill(''));
-    } catch (error) {
-      console.error('Error fetching event details:', error);
-    }
+  const handleEventClick = (event: CSREvent) => {
+    router.push(`/csr/${event.id}`);
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-emerald-700">CSR Evaluation</h1>
+    <div className="max-w-6xl mx-auto py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900">CSR Events</h1>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+          className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
         >
           Create New Event
         </button>
       </div>
 
-      {/* Events Table */}
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-6">
-        <table className="min-w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Event
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Track
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {events.map((event) => (
-              <tr
-                key={event.id}
-                onClick={() => handleEventClick(event)}
-                className="hover:bg-gray-50 cursor-pointer"
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
-                    {event.name || 'Unnamed Event'}
-                  </div>
-                  <div className="text-sm text-gray-500">{event.description}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      event.complete
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}
+      {isLoading ? (
+        <div className="h-[calc(100vh-12rem)] flex items-center justify-center">
+          <Spinner />
+        </div>
+      ) : (
+        <div className="border rounded-lg overflow-hidden">
+          {events.length === 0 ? (
+            <div className="py-12 text-center text-gray-500">
+              No CSR events found. Create your first event to get started.
+            </div>
+          ) : (
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Event Details
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Track
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {events.map((event) => (
+                  <tr
+                    key={event.id}
+                    onClick={() => handleEventClick(event)}
+                    className="hover:bg-gray-50 cursor-pointer transition-colors"
                   >
-                    {event.complete ? 'Complete' : 'Pending'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {event.track || '-'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {event.start_date || '-'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    <td className="px-6 py-4">
+                      <div className="text-sm font-medium text-gray-900">
+                        {event.name || 'Unnamed Event'}
+                      </div>
+                      <div className="text-sm text-gray-500 line-clamp-1">
+                        {event.description}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          event.complete
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}
+                      >
+                        {event.complete ? 'Complete' : 'Pending'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {event.track || '-'}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {event.start_date || '-'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
 
       {/* Create Event Modal */}
       {isModalOpen && (
