@@ -169,18 +169,6 @@ export default function CSREventClient({ eventId }: { eventId: string }) {
                 </div>
               </div>
             )}
-
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium text-gray-900">Question History</h3>
-              <div className="divide-y">
-                {event.qa_history.map(([question, answer], index) => (
-                  <div key={index} className="py-3">
-                    <p className="text-sm font-medium text-gray-600">{question}</p>
-                    <p className="text-gray-900 mt-1">{answer}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         )}
       </div>
