@@ -11,27 +11,37 @@ import {
   SolarLogout2Bold,
   SolarLogin3Bold,
 } from "./Icons";
+import { usePathname } from "next/navigation";
 
 const Sidebar: React.FC = () => {
   const { data: session } = useSession();
+  const pathname = usePathname();
 
   const menuItems = [
     {
       icon: MaterialSymbolsBarChart4BarsRounded,
       label: "Dashboard",
-      active: true,
+      href: "/dashboard",
     },
     {
       icon: MaterialSymbolsLightDocumentScannerRounded,
       label: "Reports",
+      href: "/reports",
     },
     {
       icon: SolarBuildings3Bold,
       label: "Company Profile",
+      href: "/company-profile",
     },
     {
       icon: MaterialSymbolsGlobe,
       label: "Global Metrics",
+      href: "/global-metrics",
+    },
+    {
+      icon: MaterialSymbolsLightDocumentScannerRounded,
+      label: "CSR Evaluation",
+      href: "/csr",
     },
   ];
 
@@ -39,25 +49,28 @@ const Sidebar: React.FC = () => {
     <aside className="w-64 bg-gray-900 text-white p-6 flex flex-col justify-between">
       <div>
         <div className="mb-10">
-          <h1 className="text-2xl font-bold text-emerald-400">ESG Insights</h1>
+          <Link href="/dashboard" className="block">
+            <h1 className="text-2xl font-bold text-emerald-400">ESG Insights</h1>
+          </Link>
         </div>
         <nav>
           <ul className="space-y-2">
             {menuItems.map((item) => (
-              <li
-                key={item.label}
-                className={`
-                  flex items-center p-3 rounded-lg cursor-pointer 
-                  ${
-                    item.active
-                      ? "bg-emerald-600 text-white"
-                      : "hover:bg-gray-700"
-                  }
-                `}
-              >
-                <item.icon className="w-5 h-5 mr-3" />
-                {item.label}
-              </li>
+              <Link href={item.href} key={item.label}>
+                <li
+                  className={`
+                    flex items-center p-3 rounded-lg cursor-pointer 
+                    ${
+                      pathname === item.href
+                        ? "bg-emerald-600 text-white"
+                        : "hover:bg-gray-700"
+                    }
+                  `}
+                >
+                  <item.icon className="w-5 h-5 mr-3" />
+                  {item.label}
+                </li>
+              </Link>
             ))}
           </ul>
         </nav>

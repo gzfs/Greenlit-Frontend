@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${dmSans.className} bg-gray-50`}>
+      <body className={dmSans.className}>
         <Providers>{children}</Providers>
       </body>
     </html>
