@@ -15,25 +15,68 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { description, event_id, followup_answers } = body;
+    const { description, event_id, followup_answers, name } = body;
 
-    const requestBody = {
-      description,
-      event_id,
-      followup_answers,
-      user_id: session.user.id,
-    };
+    if (event_id && followup_answers) {
+      // Handle followup answers case
+      const requestBody = {
+        event_id,
+        followup_answers,
+        user_id: session.user.id,
+      };
 
-    const response = await fetch(`${API_URL}/classify`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    });
+      const response = await fetch(`${API_URL}/aakhil/classify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
 
-    const aiResponse = await response.json();
-    return NextResponse.json(aiResponse);
+      const aiResponse = await response.json();
+      return NextResponse.json(aiResponse);
+    } else {
+      // Handle new initiative creation
+      const record = await prisma.csr_records.create({
+        data: {
+          id: Math.random().toString(36).substring(7), // Generate a random ID
+          name,
+          description,
+          user_id: session.user.id,
+          complete: false,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+      });
+
+      // Get AI classification for the new initiative
+      const requestBody = {
+        description,
+        user_id: session.user.id,
+      };
+
+      const response = await fetch(`${API_URL}/aakhil/classify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+
+      const aiResponse = await response.json();
+      
+      // Update the record with AI response data
+      const updatedRecord = await prisma.csr_records.update({
+        where: { id: record.id },
+        data: {
+          questions: aiResponse.questions,
+          track: aiResponse.track,
+        },
+      });
+
+      return NextResponse.json(updatedRecord);
+    }
   } catch (error) {
     console.error("CSR API Error:", error);
     return NextResponse.json(

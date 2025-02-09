@@ -629,7 +629,7 @@ export default function ESGPage() {
                   <p className="text-gray-600">Analyzing ESG Report...</p>
                 </div>
               ) : (
-                <UploadDropzone<OurFileRouter>
+                <UploadDropzone<OurFileRouter, any>
                   endpoint="pdfUploader"
                   onClientUploadComplete={handleFileUpload}
                   onUploadError={(error: Error) => {
