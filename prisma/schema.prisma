@@ -34,20 +34,20 @@ model Session {
 }
 
 model User {
-  id              String        @id @default(cuid())
-  name            String?
-  email           String?       @unique
-  emailVerified   DateTime?
-  password        String?
-  image           String?
-  companyName     String?
-  mission         String?
-  vision          String?
-  sector          String?
-  onboarding_data Json[]        @db.Json
-  accounts        Account[]
-  sessions        Session[]
-  csr_records     csr_records[]
+  id               String                   @id @default(cuid())
+  name             String?
+  email            String?                  @unique
+  emailVerified    DateTime?
+  password         String?
+  image            String?
+  companyName      String?
+  mission          String?
+  vision           String?
+  sector           String?
+  onboarding_data  Json[]                   @db.Json
+  accounts         Account[]
+  sessions         Session[]
+  csr_records      csr_records[]
   esg_calculations esg_score_calculations[]
 }
 
@@ -113,15 +113,15 @@ model employee_reviews {
 }
 
 model esg_score_calculations {
-  id                  String    @id @default(cuid())
+  id                  String   @id @default(cuid())
   userId              String
   pdf_url             String
   environmental_score Float
   social_score        Float
   governance_score    Float
   final_score         Float
-  explanation         Json      @db.Json
-  created_at          DateTime  @default(now())
-  updated_at          DateTime  @updatedAt
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  explanation         Json     @db.Json
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
