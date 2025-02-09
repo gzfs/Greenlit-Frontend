@@ -27,18 +27,44 @@ interface CSRModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: { title: string; description: string }) => void;
+  fetchEvents: () => Promise<void>;
 }
 
-function CSRModal({ isOpen, onClose, onSubmit }: CSRModalProps) {
+function CSRModal({ isOpen, onClose, onSubmit, fetchEvents }: CSRModalProps) {
+  const { data: session } = useSession();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ title, description });
-    setTitle("");
-    setDescription("");
-    onClose();
+    if (!session?.user?.id) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/csr", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: title,
+          description,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      await fetchEvents();
+      setTitle("");
+      setDescription("");
+      onClose();
+    } catch (error) {
+      console.error("Error creating event:", error);
+    }
+    setLoading(false);
   };
 
   return (
@@ -168,7 +194,7 @@ const CSREvaluation = () => {
     }
   };
 
-  const createCSREvent = async () => {
+  const createCSREvent = async ({ title, description }: { title: string; description: string }) => {
     if (!session?.user?.id) return;
 
     setLoading(true);
@@ -179,6 +205,7 @@ const CSREvaluation = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          name: title,
           description,
         }),
       });
@@ -190,7 +217,6 @@ const CSREvaluation = () => {
       const data = await response.json();
       await fetchEvents();
       setIsModalOpen(false);
-      setDescription("");
 
       if (data.questions && data.questions.length > 0) {
         setSelectedEvent(data);
@@ -237,11 +263,8 @@ const CSREvaluation = () => {
     router.push(`/csr/${event.id}`);
   };
 
-  const handleAddInitiative = (data: {
-    title: string;
-    description: string;
-  }) => {
-    setInitiatives([...initiatives, data]);
+  const handleAddInitiative = async (data: { title: string; description: string }) => {
+    await createCSREvent(data);
   };
 
   return (
@@ -342,6 +365,7 @@ const CSREvaluation = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddInitiative}
+        fetchEvents={fetchEvents}
       />
 
       {/* Selected Event Details */}

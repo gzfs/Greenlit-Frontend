@@ -102,9 +102,9 @@ export default function CSREventClient({ eventId }: { eventId: string }) {
       <div className="space-y-8">
         <div className="border-b pb-4">
           <h1 className="text-2xl font-semibold text-gray-900">
-            {event.current_data.name || 'CSR Event Details'}
+            {event.current_data?.name || 'CSR Event Details'}
           </h1>
-          <p className="text-gray-600 mt-2">{event.current_data.description}</p>
+          <p className="text-gray-600 mt-2">{event.current_data?.description}</p>
         </div>
 
         {!event.complete && event.current_questions ? (
@@ -140,27 +140,27 @@ export default function CSREventClient({ eventId }: { eventId: string }) {
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-1">
                 <h3 className="text-sm font-medium text-gray-500">Start Date</h3>
-                <p className="text-gray-900">{event.current_data.start_date}</p>
+                <p className="text-gray-900">{event.current_data?.start_date}</p>
               </div>
               <div className="space-y-1">
                 <h3 className="text-sm font-medium text-gray-500">End Date</h3>
-                <p className="text-gray-900">{event.current_data.end_date}</p>
+                <p className="text-gray-900">{event.current_data?.end_date}</p>
               </div>
               <div className="space-y-1">
                 <h3 className="text-sm font-medium text-gray-500">Track</h3>
-                <p className="text-gray-900">{event.current_data.track}</p>
+                <p className="text-gray-900">{event.current_data?.track}</p>
               </div>
               <div className="space-y-1">
                 <h3 className="text-sm font-medium text-gray-500">Attendees</h3>
-                <p className="text-gray-900">{event.current_data.attendees}</p>
+                <p className="text-gray-900">{event.current_data?.attendees}</p>
               </div>
             </div>
             
-            {event.current_data.metrics && event.current_data.metrics.length > 0 && (
+            {event.current_data?.metrics && event.current_data?.metrics.length > 0 && (
               <div className="space-y-3">
                 <h3 className="text-lg font-medium text-gray-900">Impact Metrics</h3>
                 <div className="divide-y">
-                  {event.current_data.metrics.map(([quantity, description], index) => (
+                  {event.current_data?.metrics.map(([quantity, description], index) => (
                     <div key={index} className="py-3 flex items-center gap-4">
                       <span className="text-lg font-semibold text-emerald-600">{quantity}</span>
                       <span className="text-gray-600">{description}</span>
