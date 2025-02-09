@@ -50,6 +50,74 @@ const insightCategories = [
   },
 ];
 
+const sustainabilityTargets = [
+  {
+    title: "Net Zero Commitment",
+    icon: <Leaf className="w-5 h-5 text-emerald-600" />,
+    targets: [
+      "Achieve net zero carbon emissions across operations by 2050",
+      "100% renewable energy sourcing by 2040",
+      "Zero waste to landfill by 2045",
+      "Carbon neutral supply chain by 2050",
+    ],
+    type: "commitment",
+  },
+  {
+    title: "Emissions Reduction",
+    icon: <TrendingUp className="w-5 h-5 text-emerald-600" />,
+    targets: [
+      {
+        text: "50% reduction in Scope 1 & 2 emissions by 2030",
+        progress: 28,
+        target: 50,
+      },
+      {
+        text: "40% reduction in Scope 3 emissions by 2035",
+        progress: 15,
+        target: 40,
+      },
+      {
+        text: "30% reduction in energy intensity by 2030",
+        progress: 22,
+        target: 30,
+      },
+      {
+        text: "25% reduction in water consumption by 2030",
+        progress: 18,
+        target: 25,
+      },
+    ],
+    type: "progress",
+  },
+  {
+    title: "Sustainable Operations",
+    icon: <Shield className="w-5 h-5 text-emerald-600" />,
+    targets: [
+      {
+        text: "100% sustainable packaging by 2030",
+        progress: 65,
+        target: 100,
+      },
+      {
+        text: "75% circular materials in production by 2040",
+        progress: 45,
+        target: 75,
+      },
+      {
+        text: "Zero deforestation in supply chain by 2025",
+        progress: 85,
+        target: 100,
+      },
+      {
+        text: "100% responsible sourcing certification by 2035",
+        progress: 70,
+        target: 100,
+      },
+    ],
+    type: "progress",
+  },
+];
+
 export default function Reports() {
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -81,6 +149,54 @@ export default function Reports() {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const renderTarget = (target: any, index: number) => {
+    if (typeof target === "string") {
+      return (
+        <div
+          key={index}
+          className="flex items-start gap-4 p-4 rounded-lg bg-emerald-50/50"
+        >
+          <div className="mt-1">
+            <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+          </div>
+          <div>
+            <p className="text-emerald-800 font-medium leading-relaxed">
+              {target}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div
+        key={index}
+        className="flex flex-col gap-2 p-4 rounded-lg bg-emerald-50/50"
+      >
+        <div className="flex items-start gap-4">
+          <div className="mt-1">
+            <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+          </div>
+          <div className="flex-1">
+            <p className="text-emerald-800 font-medium leading-relaxed mb-2">
+              {target.text}
+            </p>
+            <div className="w-full h-2 bg-emerald-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                style={{ width: `${(target.progress / target.target) * 100}%` }}
+              ></div>
+            </div>
+            <div className="flex justify-between items-center mt-1 text-sm text-emerald-600">
+              <span>Current: {target.progress}%</span>
+              <span>Target: {target.target}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -237,6 +353,110 @@ export default function Reports() {
               </div>
             </motion.div>
           </div>
+        </section>
+
+        <section className="space-y-8">
+          <h2 className="text-3xl font-bold text-emerald-800 border-b border-emerald-100 pb-4">
+            Sustainability Targets & Commitments
+          </h2>
+          <div className="grid grid-cols-1 gap-8">
+            {sustainabilityTargets.map((category) => (
+              <motion.div
+                key={category.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-8 rounded-2xl border border-emerald-400/40 backdrop-blur-md"
+              >
+                <div className="flex items-center gap-4 mb-6">
+                  {cloneElement(category.icon, {
+                    className: "w-8 h-8 text-emerald-600",
+                  })}
+                  <h3 className="text-2xl font-semibold text-emerald-800">
+                    {category.title}
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {category.targets.map((target, index) =>
+                    renderTarget(target, index)
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-8 rounded-2xl border border-emerald-400/40 backdrop-blur-md mt-8"
+          >
+            <div className="flex items-center gap-4 mb-6">
+              <TrendingUp className="w-8 h-8 text-emerald-600" />
+              <h3 className="text-2xl font-semibold text-emerald-800">
+                Key Implementation Initiatives
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-6 rounded-xl bg-emerald-50/50">
+                <h4 className="text-lg font-semibold text-emerald-800 mb-3">
+                  Clean Energy Transition
+                </h4>
+                <ul className="space-y-2 text-emerald-700">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 mt-1">•</span>
+                    <span>Solar installation across facilities</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 mt-1">•</span>
+                    <span>Power purchase agreements for wind energy</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 mt-1">•</span>
+                    <span>Energy storage solutions implementation</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="p-6 rounded-xl bg-emerald-50/50">
+                <h4 className="text-lg font-semibold text-emerald-800 mb-3">
+                  Supply Chain Optimization
+                </h4>
+                <ul className="space-y-2 text-emerald-700">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 mt-1">•</span>
+                    <span>Supplier sustainability assessments</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 mt-1">•</span>
+                    <span>Low-carbon logistics partnerships</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 mt-1">•</span>
+                    <span>Circular economy initiatives</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="p-6 rounded-xl bg-emerald-50/50">
+                <h4 className="text-lg font-semibold text-emerald-800 mb-3">
+                  Innovation & Technology
+                </h4>
+                <ul className="space-y-2 text-emerald-700">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 mt-1">•</span>
+                    <span>Carbon capture research & development</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 mt-1">•</span>
+                    <span>AI-powered energy optimization</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 mt-1">•</span>
+                    <span>Sustainable material innovation</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </motion.div>
         </section>
 
         <section className="space-y-8">

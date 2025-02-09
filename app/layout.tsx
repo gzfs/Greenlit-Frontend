@@ -6,7 +6,7 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 export const onest = Onest({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "Greenlit - ESG Reporting Made Easy",
   description: "Streamline your ESG reporting process with Greenlit",
 };
