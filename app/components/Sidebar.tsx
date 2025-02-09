@@ -14,6 +14,7 @@ import {
 import { usePathname } from "next/navigation";
 import { PAGES } from "../page";
 import { motion, AnimatePresence } from "framer-motion";
+import { FileText } from "lucide-react";
 
 export default function Sidebar({
   currentPage,
@@ -37,7 +38,7 @@ export default function Sidebar({
     {
       icon: MaterialSymbolsLightDocumentScannerRounded,
       label: "Reports",
-      href: "#",
+      href: "/reports",
       page: PAGES.GOVERNANCE,
     },
     {

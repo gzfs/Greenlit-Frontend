@@ -25,6 +25,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
 } from "recharts";
+import { TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
 
 interface TimeSeriesData {
   year: number;
@@ -80,6 +81,26 @@ const renderCustomizedLabel = ({
       {`${(percent * 100).toFixed(0)}%`}
     </text>
   );
+};
+
+const formatChange = (change: number) => {
+  const isPositive = change > 0;
+  return {
+    text: `${isPositive ? "+" : ""}${change.toFixed(1)}%`,
+    color: isPositive ? "text-emerald-600" : "text-red-500",
+  };
+};
+
+const getGradient = (value: number) => {
+  if (value > 0) return "bg-gradient-to-r from-emerald-500 to-emerald-300";
+  if (value < 0) return "bg-gradient-to-r from-red-500 to-red-300";
+  return "bg-gradient-to-r from-yellow-500 to-yellow-300";
+};
+
+const getTrendIcon = (value: number) => {
+  if (value > 0) return <TrendingUp className="w-4 h-4 text-emerald-500" />;
+  if (value < 0) return <TrendingDown className="w-4 h-4 text-red-500" />;
+  return <ArrowRight className="w-4 h-4 text-yellow-500" />;
 };
 
 export function ComparativeAnalytics({ data }: ComparativeAnalyticsProps) {
@@ -155,24 +176,127 @@ export function ComparativeAnalytics({ data }: ComparativeAnalyticsProps) {
     },
   ];
 
+  // Add these new data transformations after existing ones
+  const performanceMetrics = [
+    {
+      category: "Environmental",
+      metrics: [
+        {
+          name: "Emissions",
+          current:
+            emissionsData[1].scope1 +
+            emissionsData[1].scope2 +
+            emissionsData[1].scope3,
+          previous:
+            emissionsData[0].scope1 +
+            emissionsData[0].scope2 +
+            emissionsData[0].scope3,
+        },
+        {
+          name: "Energy",
+          current: data["Total energy consumed"][1],
+          previous: data["Total energy consumed"][0],
+        },
+        {
+          name: "Water",
+          current: data["Water consumption"][1],
+          previous: data["Water consumption"][0],
+        },
+      ],
+    },
+    {
+      category: "Social",
+      metrics: [
+        {
+          name: "Employee",
+          current: data["Employee satisfaction"][1],
+          previous: data["Employee satisfaction"][0],
+        },
+        {
+          name: "Investment",
+          current: data["Community investment"][1],
+          previous: data["Community investment"][0],
+        },
+      ],
+    },
+  ];
+
   return (
-    <div className="space-y-8 w-full">
-      {/* Emissions Section */}
+    <div className="space-y-4 w-full">
+      {/* Enhanced Text Analytics */}
       <section>
-        <h2 className="text-2xl font-semibold tracking-tight text-emerald-800 mb-6">
-          Emissions Distribution
+        <h2 className="text-xl font-semibold text-emerald-800 mb-3">
+          Year-over-Year Analysis
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+          {Object.entries(data).map(([key, values], index) => {
+            const changeValue = ((values[1] - values[0]) / values[0]) * 100;
+            const { text, color } = formatChange(changeValue);
+            const gradientClass = getGradient(changeValue);
+            const trendIcon = getTrendIcon(changeValue);
+
+            return (
+              <motion.div
+                key={key}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.02 }}
+                className="p-3 rounded-lg border border-emerald-400/40 backdrop-blur-md hover:bg-white/5 transition-all duration-300 hover:shadow-lg"
+              >
+                <div className="flex items-start justify-between">
+                  <div
+                    className="text-xs text-emerald-600/80 font-medium truncate"
+                    title={key}
+                  >
+                    {key}
+                  </div>
+                  {trendIcon}
+                </div>
+                <div className="mt-2 flex flex-col gap-1">
+                  <div className="flex items-baseline justify-between">
+                    <span className={`text-lg font-bold ${color}`}>{text}</span>
+                    <span className="text-xs text-emerald-600/60">
+                      YoY Change
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-2 text-xs text-emerald-600/80">
+                    <span>{values[0].toLocaleString()}</span>
+                    <ArrowRight className="w-3 h-3" />
+                    <span className="font-medium">
+                      {values[1].toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-2 h-1 bg-emerald-100/30 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${gradientClass} rounded-full transition-all duration-500`}
+                    style={{
+                      width: `${Math.min(Math.abs(changeValue), 100)}%`,
+                    }}
+                  />
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Visualization Grid - Bottom Section with more columns */}
+      <section>
+        <h2 className="text-xl font-semibold text-emerald-800 mb-3">
+          Performance Visualizations
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2">
           {/* Line Chart */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-4 sm:p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
+            className="p-2 rounded-md border border-emerald-400/40 backdrop-blur-md"
           >
-            <h3 className="text-base sm:text-lg font-medium text-emerald-700 mb-4">
+            <h3 className="text-[10px] font-medium text-emerald-700 mb-1">
               Emissions Trend
             </h3>
-            <div className="h-[250px] sm:h-[300px]">
+            <div className="h-[140px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={emissionsData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#D1FAE5" />
@@ -202,14 +326,14 @@ export function ComparativeAnalytics({ data }: ComparativeAnalyticsProps) {
 
           {/* Donut Chart */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-4 sm:p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
+            className="p-2 rounded-md border border-emerald-400/40 backdrop-blur-md"
           >
-            <h3 className="text-base sm:text-lg font-medium text-emerald-700 mb-4">
+            <h3 className="text-[10px] font-medium text-emerald-700 mb-1">
               Current Distribution
             </h3>
-            <div className="h-[250px] sm:h-[300px]">
+            <div className="h-[140px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -236,25 +360,17 @@ export function ComparativeAnalytics({ data }: ComparativeAnalyticsProps) {
               </ResponsiveContainer>
             </div>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Resource Management Section */}
-      <section className="mt-6 sm:mt-8">
-        <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-emerald-800 mb-4 sm:mb-6">
-          Resource Management
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* Radar Chart */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-4 sm:p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
+            className="p-2 rounded-md border border-emerald-400/40 backdrop-blur-md"
           >
-            <h3 className="text-base sm:text-lg font-medium text-emerald-700 mb-4">
+            <h3 className="text-[10px] font-medium text-emerald-700 mb-1">
               Resource Distribution
             </h3>
-            <div className="h-[250px] sm:h-[300px]">
+            <div className="h-[140px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart
                   cx="50%"
@@ -280,14 +396,14 @@ export function ComparativeAnalytics({ data }: ComparativeAnalyticsProps) {
 
           {/* Radial Bar Chart */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-4 sm:p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
+            className="p-2 rounded-md border border-emerald-400/40 backdrop-blur-md"
           >
-            <h3 className="text-base sm:text-lg font-medium text-emerald-700 mb-4">
+            <h3 className="text-[10px] font-medium text-emerald-700 mb-1">
               Performance Metrics
             </h3>
-            <div className="h-[250px] sm:h-[300px]">
+            <div className="h-[140px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RadialBarChart
                   cx="50%"
@@ -313,29 +429,111 @@ export function ComparativeAnalytics({ data }: ComparativeAnalyticsProps) {
         </div>
       </section>
 
-      {/* Year-over-Year Changes */}
-      <section className="mt-6 sm:mt-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {Object.entries(data).map(([key, values], index) => {
-            const change = (
-              ((values[1] - values[0]) / values[0]) *
-              100
-            ).toFixed(1);
-            return (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="p-4 sm:p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
-              >
-                <div className="text-sm text-emerald-600">{key}</div>
-                <div className="text-2xl font-semibold text-emerald-700 mt-2">
-                  {change}% YoY
-                </div>
-              </motion.div>
-            );
-          })}
+      {/* Add this section after the existing visualizations */}
+      <section className="mt-8">
+        <h2 className="text-xl font-semibold text-emerald-800 mb-4">
+          Performance Deep Dive
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Category Performance Cards */}
+          {performanceMetrics.map((category) => (
+            <motion.div
+              key={category.category}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-4 rounded-xl border border-emerald-400/40 backdrop-blur-md hover:shadow-lg transition-all duration-300"
+            >
+              <h3 className="text-lg font-medium text-emerald-700 mb-3">
+                {category.category} Performance
+              </h3>
+              <div className="space-y-4">
+                {category.metrics.map((metric) => {
+                  const change =
+                    ((metric.current - metric.previous) / metric.previous) *
+                    100;
+                  const { color } = formatChange(change);
+                  const gradientClass = getGradient(change);
+                  return (
+                    <div key={metric.name} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-emerald-600/80">
+                          {metric.name}
+                        </span>
+                        <span className={`text-sm font-medium ${color}`}>
+                          {change > 0 ? "+" : ""}
+                          {change.toFixed(1)}%
+                        </span>
+                      </div>
+                      <div className="h-2 bg-emerald-100/30 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${gradientClass} rounded-full transition-all duration-500`}
+                          style={{
+                            width: `${Math.min(Math.abs(change), 100)}%`,
+                          }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-emerald-600/60">
+                        <span>{metric.previous.toLocaleString()}</span>
+                        <ArrowRight className="w-3 h-3" />
+                        <span className="font-medium">
+                          {metric.current.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          ))}
+
+          {/* Trend Analysis */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-4 rounded-xl border border-emerald-400/40 backdrop-blur-md hover:shadow-lg transition-all duration-300 lg:col-span-2"
+          >
+            <h3 className="text-lg font-medium text-emerald-700 mb-3">
+              Combined Performance Trends
+            </h3>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={emissionsData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D1FAE5" />
+                  <XAxis dataKey="year" stroke="#047857" />
+                  <YAxis stroke="#047857" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      borderRadius: "8px",
+                      border: "1px solid #10B981",
+                      padding: "12px",
+                    }}
+                  />
+                  <Legend />
+                  <Area
+                    type="monotone"
+                    dataKey="scope1"
+                    fill={COLORS.primary}
+                    stroke={COLORS.primary}
+                    fillOpacity={0.3}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="scope2"
+                    fill={COLORS.secondary}
+                    stroke={COLORS.secondary}
+                    fillOpacity={0.3}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="scope3"
+                    stroke={COLORS.accent}
+                    strokeWidth={2}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
         </div>
       </section>
     </div>

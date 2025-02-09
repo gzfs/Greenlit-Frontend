@@ -12,338 +12,376 @@ import {
   PieChart,
   Pie,
   Cell,
+  LineChart,
+  Line,
   Legend,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  Radar,
+  ComposedChart,
 } from "recharts";
 
-const CHART_COLORS = {
-  positive: {
-    main: "#10B981",
-    light: "#34D399",
-    lighter: "#6EE7B7",
-  },
-  negative: {
-    main: "#F43F5E",
-    light: "#FB7185",
-    lighter: "#FDA4AF",
-  },
+const COLORS = {
+  primary: "#10B981",
+  secondary: "#6366F1",
+  accent: "#F59E0B",
+  danger: "#EF4444",
+  success: "#22C55E",
 } as const;
 
+const metrics = [
+  { name: "Overall Rating", value: 4.2, change: "+0.3" },
+  { name: "Work-Life Balance", value: 4.0, change: "+0.2" },
+  { name: "Career Growth", value: 3.8, change: "+0.4" },
+  { name: "Compensation", value: 4.1, change: "+0.1" },
+  { name: "Management", value: 3.9, change: "+0.2" },
+  { name: "Culture", value: 4.3, change: "+0.5" },
+  { name: "Benefits", value: 4.4, change: "+0.3" },
+  { name: "Learning", value: 4.0, change: "+0.2" },
+];
+
+const sentimentTrend = [
+  { month: "Jan", positive: 75, neutral: 15, negative: 10 },
+  { month: "Feb", positive: 78, neutral: 14, negative: 8 },
+  { month: "Mar", positive: 80, neutral: 12, negative: 8 },
+  { month: "Apr", positive: 82, neutral: 11, negative: 7 },
+];
+
 const topConcerns = [
-  { name: "Work Pressure", value: 126 },
-  { name: "No Job Security", value: 78 },
-  { name: "Poor Management", value: 74 },
-  { name: "Job Security", value: 66 },
-  { name: "Low Salary", value: 63 },
-].map((item) => ({
-  ...item,
-  percentage: ((item.value / 635) * 100).toFixed(1),
-}));
-
-const topPositives = [
-  { name: "Work Life Balance", value: 127 },
-  { name: "Good Culture", value: 77 },
-  { name: "Virtual Roles", value: 64 },
-  { name: "Good Pay", value: 63 },
-  { name: "Learning Opportunities", value: 63 },
-].map((item) => ({
-  ...item,
-  percentage: ((item.value / 635) * 100).toFixed(1),
-}));
-
-const sentimentOverview = [
-  { name: "Positive", value: 635 },
-  { name: "Negative", value: 635 },
+  { subject: "Work Pressure", value: 65 },
+  { subject: "Communication", value: 45 },
+  { subject: "Training", value: 40 },
+  { subject: "Resources", value: 35 },
+  { subject: "Recognition", value: 30 },
 ];
 
-// Add raw sentiment data
-const sentimentData = {
-  "work pressure": 126,
-  "performance measurement": 31,
-  "project dependency": 15,
-  "job security": 66,
-  "no job security": 78,
-  "bad hr": 21,
-  "redundant interview": 11,
-  "low salary": 63,
-  "poor management": 74,
-  // ... other data points
-};
-
-// Add sentiment ratio calculation
-const totalMentions = Object.values(sentimentData).reduce(
-  (acc, val) => acc + val,
-  0
-);
-const sentimentRatio = [
-  { name: "Positive Sentiment", value: 635, percentage: 50 },
-  { name: "Negative Sentiment", value: 635, percentage: 50 },
+const departmentSentiment = [
+  {
+    department: "Engineering",
+    satisfaction: 4.5,
+    engagement: 4.2,
+    retention: 92,
+  },
+  {
+    department: "Marketing",
+    satisfaction: 4.2,
+    engagement: 4.0,
+    retention: 88,
+  },
+  { department: "Sales", satisfaction: 4.0, engagement: 4.3, retention: 85 },
+  { department: "HR", satisfaction: 4.6, engagement: 4.4, retention: 95 },
+  { department: "Product", satisfaction: 4.3, engagement: 4.1, retention: 90 },
 ];
 
-// Add category breakdown
-const categoryBreakdown = [
-  { name: "Work Environment", value: 253, category: "negative" },
-  { name: "Job Security", value: 188, category: "negative" },
-  { name: "Management", value: 143, category: "negative" },
-  { name: "Work Culture", value: 204, category: "positive" },
-  { name: "Growth", value: 187, category: "positive" },
-  { name: "Benefits", value: 126, category: "positive" },
+const retentionTrend = [
+  { month: "Jan", retention: 94, turnover: 6, newHires: 8 },
+  { month: "Feb", retention: 93, turnover: 7, newHires: 10 },
+  { month: "Mar", retention: 95, turnover: 5, newHires: 12 },
+  { month: "Apr", retention: 96, turnover: 4, newHires: 9 },
+];
+
+const satisfactionFactors = [
+  { name: "Work Environment", value: 85 },
+  { name: "Compensation", value: 78 },
+  { name: "Career Growth", value: 72 },
+  { name: "Management", value: 80 },
+  { name: "Work-Life Balance", value: 88 },
+  { name: "Benefits", value: 82 },
 ];
 
 export function EmployeeSentimentAnalytics() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full">
+      {/* Metrics Cards */}
       <section>
-        <h2 className="text-2xl font-semibold tracking-tight text-emerald-800 mb-6">
-          Employee Sentiment Analysis
+        <h2 className="text-2xl font-semibold text-emerald-800 mb-6">
+          Employee Sentiment Overview
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {metrics.map((metric, index) => (
+            <motion.div
+              key={metric.name}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="p-4 rounded-xl border border-emerald-400/40 backdrop-blur-md hover:bg-white/5 transition-all duration-300 hover:shadow-lg"
+            >
+              <div className="text-sm text-emerald-600/80 font-medium">
+                {metric.name}
+              </div>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-emerald-700">
+                  {metric.value}
+                </span>
+                <span
+                  className={`text-sm font-medium ${
+                    metric.change.startsWith("+")
+                      ? "text-emerald-500"
+                      : "text-red-500"
+                  }`}
+                >
+                  {metric.change}
+                </span>
+              </div>
+              <div className="mt-2 h-1 bg-emerald-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 rounded-full"
+                  style={{ width: `${metric.value * 20}%` }}
+                />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Visualizations */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-semibold text-emerald-800 mb-6">
+          Detailed Analysis
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Top Concerns */}
+          {/* Sentiment Trend */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
+            className="p-6 rounded-xl border border-emerald-400/40 backdrop-blur-md hover:shadow-lg transition-all duration-300"
           >
             <h3 className="text-lg font-medium text-emerald-700 mb-4">
-              Top Employee Concerns
+              Sentiment Trends Over Time
             </h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={topConcerns}
-                  layout="vertical"
-                  margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
-                >
+                <BarChart data={sentimentTrend}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#D1FAE5" />
-                  <XAxis type="number" stroke="#047857" />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
-                    stroke="#047857"
-                    width={100}
-                  />
+                  <XAxis dataKey="month" stroke="#047857" />
+                  <YAxis stroke="#047857" />
                   <Tooltip
-                    formatter={(value: number) => [
-                      `${value} employees`,
-                      "Count",
-                    ]}
                     contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.8)",
-                      borderColor: CHART_COLORS.negative.main,
-                      borderRadius: "0.75rem",
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      borderRadius: "8px",
+                      border: "1px solid #10B981",
+                      padding: "12px",
+                    }}
+                  />
+                  <Legend
+                    wrapperStyle={{
+                      paddingTop: "20px",
                     }}
                   />
                   <Bar
-                    dataKey="value"
-                    fill={CHART_COLORS.negative.main}
-                    radius={[0, 4, 4, 0]}
-                  >
-                    {topConcerns.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          CHART_COLORS.negative[
-                            index % 2 === 0 ? "main" : "light"
-                          ]
-                        }
-                      />
-                    ))}
-                  </Bar>
+                    dataKey="positive"
+                    stackId="a"
+                    fill={COLORS.success}
+                    name="Positive"
+                  />
+                  <Bar
+                    dataKey="neutral"
+                    stackId="a"
+                    fill={COLORS.accent}
+                    name="Neutral"
+                  />
+                  <Bar
+                    dataKey="negative"
+                    stackId="a"
+                    fill={COLORS.danger}
+                    name="Negative"
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </motion.div>
 
-          {/* Top Positives */}
+          {/* Top Concerns */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
+            className="p-6 rounded-xl border border-emerald-400/40 backdrop-blur-md hover:shadow-lg transition-all duration-300"
           >
             <h3 className="text-lg font-medium text-emerald-700 mb-4">
-              Top Positive Aspects
+              Key Areas of Focus
             </h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={topPositives}
-                  layout="vertical"
-                  margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#D1FAE5" />
-                  <XAxis type="number" stroke="#047857" />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
+                <RadarChart data={topConcerns}>
+                  <PolarGrid stroke="#D1FAE5" />
+                  <PolarAngleAxis
+                    dataKey="subject"
                     stroke="#047857"
-                    width={100}
+                    tick={{ fill: "#047857", fontSize: 12 }}
+                  />
+                  <Radar
+                    name="Concern Level"
+                    dataKey="value"
+                    stroke={COLORS.primary}
+                    fill={COLORS.primary}
+                    fillOpacity={0.4}
                   />
                   <Tooltip
-                    formatter={(value: number) => [
-                      `${value} employees`,
-                      "Count",
-                    ]}
                     contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.8)",
-                      borderColor: CHART_COLORS.positive.main,
-                      borderRadius: "0.75rem",
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      borderRadius: "8px",
+                      border: "1px solid #10B981",
                     }}
                   />
-                  <Bar
-                    dataKey="value"
-                    fill={CHART_COLORS.positive.main}
-                    radius={[0, 4, 4, 0]}
-                  >
-                    {topPositives.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          CHART_COLORS.positive[
-                            index % 2 === 0 ? "main" : "light"
-                          ]
-                        }
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
+                  <Legend />
+                </RadarChart>
               </ResponsiveContainer>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Add new section for overall sentiment */}
-      <section className="mt-12">
+      {/* Department Analysis */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-semibold text-emerald-800 mb-6">
+          Department Analysis
+        </h2>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-6 rounded-xl border border-emerald-400/40 backdrop-blur-md hover:shadow-lg transition-all duration-300"
+        >
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={departmentSentiment} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="#D1FAE5" />
+                <XAxis type="number" domain={[0, 100]} stroke="#047857" />
+                <YAxis
+                  dataKey="department"
+                  type="category"
+                  stroke="#047857"
+                  width={100}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "rgba(255, 255, 255, 0.9)",
+                    borderRadius: "8px",
+                    border: "1px solid #10B981",
+                    padding: "12px",
+                  }}
+                />
+                <Legend />
+                <Bar
+                  dataKey="satisfaction"
+                  name="Satisfaction"
+                  fill={COLORS.primary}
+                />
+                <Bar
+                  dataKey="engagement"
+                  name="Engagement"
+                  fill={COLORS.secondary}
+                />
+                <Bar
+                  dataKey="retention"
+                  name="Retention %"
+                  fill={COLORS.success}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Retention & Satisfaction Analysis */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-semibold text-emerald-800 mb-6">
+          Retention & Satisfaction Insights
+        </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Sentiment Distribution */}
+          {/* Retention Trend */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
+            className="p-6 rounded-xl border border-emerald-400/40 backdrop-blur-md hover:shadow-lg transition-all duration-300"
           >
             <h3 className="text-lg font-medium text-emerald-700 mb-4">
-              Overall Sentiment Distribution
+              Employee Retention Trends
+            </h3>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={retentionTrend}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D1FAE5" />
+                  <XAxis dataKey="month" stroke="#047857" />
+                  <YAxis stroke="#047857" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      borderRadius: "8px",
+                      border: "1px solid #10B981",
+                      padding: "12px",
+                    }}
+                  />
+                  <Legend />
+                  <Bar
+                    dataKey="newHires"
+                    fill={COLORS.success}
+                    name="New Hires"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="retention"
+                    stroke={COLORS.primary}
+                    name="Retention %"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="turnover"
+                    stroke={COLORS.danger}
+                    name="Turnover %"
+                    strokeWidth={2}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+
+          {/* Satisfaction Factors */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-6 rounded-xl border border-emerald-400/40 backdrop-blur-md hover:shadow-lg transition-all duration-300"
+          >
+            <h3 className="text-lg font-medium text-emerald-700 mb-4">
+              Satisfaction Factors
             </h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={sentimentRatio}
+                    data={satisfactionFactors}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
-                    outerRadius={80}
+                    outerRadius={100}
+                    fill="#8884d8"
                     paddingAngle={5}
                     dataKey="value"
+                    label={({ name, value }) => `${name}: ${value}%`}
                   >
-                    <Cell fill={CHART_COLORS.positive.main} />
-                    <Cell fill={CHART_COLORS.negative.main} />
+                    {satisfactionFactors.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          Object.values(COLORS)[
+                            index % Object.keys(COLORS).length
+                          ]
+                        }
+                      />
+                    ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value: number) => [
-                      `${((value / totalMentions) * 100).toFixed(1)}%`,
-                      "Percentage",
-                    ]}
                     contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.8)",
-                      borderRadius: "0.75rem",
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      borderRadius: "8px",
+                      border: "1px solid #10B981",
+                      padding: "12px",
                     }}
                   />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
-            </div>
-          </motion.div>
-
-          {/* Category Breakdown */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
-          >
-            <h3 className="text-lg font-medium text-emerald-700 mb-4">
-              Sentiment by Category
-            </h3>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={categoryBreakdown}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#D1FAE5" />
-                  <XAxis
-                    dataKey="name"
-                    stroke="#047857"
-                    angle={-45}
-                    textAnchor="end"
-                    height={100}
-                  />
-                  <YAxis stroke="#047857" />
-                  <Tooltip
-                    formatter={(value: number) => [
-                      `${value} mentions`,
-                      "Count",
-                    ]}
-                    contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.8)",
-                      borderRadius: "0.75rem",
-                    }}
-                  />
-                  <Bar dataKey="value">
-                    {categoryBreakdown.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          CHART_COLORS[
-                            entry.category as keyof typeof CHART_COLORS
-                          ].main
-                        }
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Add trend indicators */}
-      <section className="mt-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
-          >
-            <div className="text-sm text-emerald-600">Total Responses</div>
-            <div className="text-2xl font-semibold text-emerald-700 mt-2">
-              635
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
-          >
-            <div className="text-sm text-emerald-600">Satisfaction Rate</div>
-            <div className="text-2xl font-semibold text-emerald-700 mt-2">
-              50%
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="p-6 rounded-3xl border border-emerald-400/40 backdrop-blur-md"
-          >
-            <div className="text-sm text-emerald-600">Top Concern</div>
-            <div className="text-2xl font-semibold text-emerald-700 mt-2">
-              Work Pressure
             </div>
           </motion.div>
         </div>
