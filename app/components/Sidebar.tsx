@@ -53,6 +53,12 @@ export default function Sidebar({
       href: "/csr",
       page: PAGES.CSR,
     },
+    {
+      icon: MaterialSymbolsBarChart4BarsRounded,
+      label: "ESG Score",
+      href: "/esg",
+      page: PAGES.ESG,
+    },
   ];
 
   useEffect(() => {

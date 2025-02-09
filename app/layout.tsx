@@ -1,22 +1,14 @@
 import type { Metadata } from "next";
-import { DM_Sans, Onest } from "next/font/google";
+import { Inter, Onest } from "next/font/google";
 import "./globals.css";
-import Providers from "./providers";
-import { Toaster } from "@/components/ui/sonner";
+import { Providers } from "./providers";
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700"],
-});
+const inter = Inter({ subsets: ["latin"] });
+export const onest = Onest({ subsets: ["latin"] });
 
-export const onest = Onest({
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700"],
-});
-
-const metadata: Metadata = {
-  title: "ESG Insights",
-  description: "AI-Powered ESG Performance Dashboard",
+export const metadata: Metadata = {
+  title: "Greenlit - ESG Reporting Made Easy",
+  description: "Streamline your ESG reporting process with Greenlit",
 };
 
 export default function RootLayout({
@@ -26,9 +18,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={dmSans.className}>
+      <body className={inter.className}>
         <Providers>{children}</Providers>
-        <Toaster />
       </body>
     </html>
   );

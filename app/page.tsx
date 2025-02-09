@@ -10,6 +10,7 @@ export enum PAGES {
   ENVIRONMENT,
   SOCIAL,
   CSR,
+  ESG,
 }
 
 export default function Home() {
