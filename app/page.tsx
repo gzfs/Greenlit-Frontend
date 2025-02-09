@@ -1,29 +1,44 @@
 "use client";
 
-import React, { useState } from "react";
-import Sidebar from "./components/Sidebar";
-import Onboarding from "./components/Onboarding";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import HomePage from "./(marketing)/page";
 
 export enum PAGES {
-  ONBOARDING,
-  GOVERNANCE,
-  ENVIRONMENT,
-  SOCIAL,
-  CSR,
-  ESG,
+  ONBOARDING = "ONBOARDING",
+  GOVERNANCE = "GOVERNANCE",
+  CSR = "CSR",
+  ESG = "ESG",
 }
 
-export default function Home() {
-  const [currentView, setCurrentView] = useState<PAGES>(PAGES.ONBOARDING);
+export default function RootPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
-  return (
-    <main className="min-h-screen bg-gradient-to-br from-emerald-50/20 via-transparent to-sky-50/20">
-      <div className="fixed inset-0 bg-[url('/noise.png')] opacity-[0.01] mix-blend-overlay pointer-events-none" />
-      <Sidebar currentPage={currentView} setCurrentPage={setCurrentView} />
-      <div className="relative min-h-screen w-full p-4 md:p-8">
-        {currentView === PAGES.ONBOARDING && <Onboarding />}
-        {/* Add other views here */}
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/onboarding");
+    }
+  }, [status, router]);
+
+  // Show loading state while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-4 mx-auto" />
+          <p className="text-emerald-600">Loading...</p>
+        </div>
       </div>
-    </main>
-  );
+    );
+  }
+
+  // Show marketing homepage for unauthenticated users
+  if (status === "unauthenticated") {
+    return <HomePage />;
+  }
+
+  // This will briefly show while redirecting to onboarding
+  return null;
 }
