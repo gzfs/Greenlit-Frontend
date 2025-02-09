@@ -9,7 +9,6 @@ import { determineSector } from "@/app/utils/sectorAnalysis";
 import Image from "next/image";
 import { toast } from "sonner";
 import { TablerCloverFilled } from "@/app/components/Icons";
-import { onest } from "@/app/layout";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -87,7 +86,7 @@ export default function RegisterPage() {
         <div className="flex-1">
           <div className="backdrop-blur-lg border border-emerald-400/40 bg-white/10 p-8 rounded-3xl shadow-[0px_0px_30px_rgba(255,255,255,0.1)]">
             <p
-              className={`${onest.className} text-4xl font-semibold space-x-2 text-center text-emerald-700 tracking-tighter mb-6`}
+              className={`$text-4xl font-semibold space-x-2 text-center text-emerald-700 tracking-tighter mb-6`}
             >
               <TablerCloverFilled className="inline-block text-5xl" />
               <span>greenlit</span>
