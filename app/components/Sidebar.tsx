@@ -14,7 +14,7 @@ import {
 import { usePathname } from "next/navigation";
 import { PAGES } from "../page";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText } from "lucide-react";
+import { Calculator, FileText } from "lucide-react";
 
 export default function Sidebar({
   currentPage,
@@ -58,6 +58,18 @@ export default function Sidebar({
       label: "ESG Score",
       href: "/esg",
       page: PAGES.ESG,
+    },
+    {
+      icon: MaterialSymbolsLightDocumentScannerRounded,
+      label: "Agent Aggregator",
+      href: "/agent-aggregation",
+      page: undefined,
+    },
+    {
+      name: "Emissions Calculator",
+      label: "Emissions Calculator",
+      href: "/emissions-calculator",
+      icon: Calculator,
     },
   ];
 
