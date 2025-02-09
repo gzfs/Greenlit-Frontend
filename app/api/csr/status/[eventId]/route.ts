@@ -14,7 +14,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const response = await fetch(`${API_URL}/status/${params.eventId}`, {
+    const response = await fetch(`${API_URL}/aakhil/status/${params.eventId}`, {
       headers: {
         'Content-Type': 'application/json',
       },

@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
         user_id: session.user.id,
       };
 
-      const response = await fetch(`${API_URL}/classify`, {
+      const response = await fetch(`${API_URL}/aakhil/classify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,13 +55,14 @@ export async function POST(request: NextRequest) {
         user_id: session.user.id,
       };
 
-      const response = await fetch(`${API_URL}/classify`, {
+      const response = await fetch(`${API_URL}/aakhil/classify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
       });
+
 
       const aiResponse = await response.json();
       
